@@ -1,0 +1,41 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+before_script:
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+
+# Build stage: Build the Docker image
+build:
+  stage: build
+  script:
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+  only:
+    - main
+
+# Test stage: Run tests using the built Docker image
+test:
+  stage: test
+  script:
+    - docker pull $IMAGE_TAG
+    - docker run --rm $IMAGE_TAG npm test
+  only:
+    - main
+
+# Deploy stage: Deploy the Dockerized app to a server
+deploy:
+  stage: deploy
+  script:
+    - echo "$CI_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh -o StrictHostKeyChecking=no user@ec2-ip-address 'docker pull $IMAGE_TAG && docker stop myapp || true && docker rm myapp || true && docker run -d --name myapp -p 3000:3000 $IMAGE_TAG'
+  environment:
+    name: production
+    url: http://ec2-ip-address:3000
+  only:
+    - main
