@@ -1,27 +1,25 @@
 stages:
-  - build
   - deploy
 
-# Build Job
-build:
-  image: docker:latest
-  stage: build
-  services:
-    - docker:dind  # Docker-in-Docker service to build the Docker image
-  script:
-    - docker build -t node_app .  # Build the Docker image
-    - docker-compose up -d  # Run the application using Docker Compose
-  only:
-    - main  # Only trigger this job on the master branch
-
-# Deploy Job
 deploy:
-  image: docker:latest
+  image: jonaskello/docker-and-compose:1.12.1-1.8.0
   stage: deploy
-  services:
-    - docker:dind
   script:
-    - docker-compose down  # Stop any existing containers
-    - docker-compose up -d  # Deploy the new containers
+    - mkdir -p ~/.ssh
+    - echo "$GITLAB_SSH_PRIVATE_KEY" > ~/.ssh/gitlab_id_rsa
+    - chmod 600 ~/.ssh/gitlab_id_rsa
+    - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
+    - cd node-app
+    - git pull git@gitlab.com:project6812147/node-app.git main
+    - docker-compose down
+    - docker-compose up -d
+    - mkdir -p ~/.ssh
+    - echo "$EC2_PEM_KEY" > ~/.ssh/ec2-key.pem
+    - chmod 600 ~/.ssh/ec2-key.pem
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@35.154.235.73 '
+        cd /home/ec2-user/node-app &&
+        git pull git@gitlab.com:project6812147/node-app.git main &&
+        docker-compose down &&
+        docker-compose up -d'
   only:
-    - main  # Only trigger this job on the master branch
+    - main
