@@ -9,7 +9,7 @@ deploy:
     - mkdir -p ~/.ssh
     - echo "$EC2_PEM_KEY" > ~/.ssh/ec2-key.pem
     - chmod 600 ~/.ssh/ec2-key.pem
-    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@<EC2_PUBLIC_IP> '
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@<35.154.235.73 '
         cd /home/ec2-user/node-app &&
         git pull git@gitlab.com:<your_project_namespace>/node-app.git &&
         docker-compose down &&
