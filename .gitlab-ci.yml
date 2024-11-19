@@ -23,3 +23,5 @@ deploy:
         docker-compose up -d'
   only:
     - main
+  tags:
+    - docker
