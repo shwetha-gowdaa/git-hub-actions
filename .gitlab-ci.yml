@@ -9,7 +9,7 @@ build:
   services:
     - docker:dind  # Docker-in-Docker service to build the Docker image
   script:
-    - docker build -t my-node-app .  # Build the Docker image
+    - docker build -t node_app .  # Build the Docker image
     - docker-compose up -d  # Run the application using Docker Compose
   only:
     - main  # Only trigger this job on the master branch
