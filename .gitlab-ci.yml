@@ -2,26 +2,17 @@ stages:
   - deploy
 
 deploy:
-  image: jonaskello/docker-and-compose:1.12.1-1.8.0
   stage: deploy
+  tags:
+    - docker
   script:
-    - mkdir -p ~/.ssh
-    - echo "$GITLAB_SSH_PRIVATE_KEY" > ~/.ssh/gitlab_id_rsa
-    - chmod 600 ~/.ssh/gitlab_id_rsa
-    - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
-    - cd node-app
-    - git pull git@gitlab.com:project6812147/node-app.git main
-    - docker-compose down
-    - docker-compose up -d
     - mkdir -p ~/.ssh
     - echo "$EC2_PEM_KEY" > ~/.ssh/ec2-key.pem
     - chmod 600 ~/.ssh/ec2-key.pem
-    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@35.154.235.73 '
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@<EC2_PUBLIC_IP> '
         cd /home/ec2-user/node-app &&
-        git pull git@gitlab.com:project6812147/node-app.git main &&
+        git pull git@gitlab.com:<your_project_namespace>/node-app.git &&
         docker-compose down &&
         docker-compose up -d'
   only:
     - main
-  tags:
-    - docker
