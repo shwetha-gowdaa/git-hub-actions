@@ -11,26 +11,31 @@ before_script:
   - echo "Logging into Docker registry"
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
+# Build Stage
 build:
   stage: build
   script:
     - echo "Building Docker image"
     - docker-compose -f docker-compose.yml build
+    - docker tag nodejs-app $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   only:
-    - main  # or the branch you want to trigger this job
+    - main
 
+# Test Stage
 test:
   stage: test
   script:
     - echo "Running tests in Docker container"
-    - docker-compose -f docker-compose.yml run --rm app npm test
+    - docker-compose -f docker-compose.yml run --rm nodejs-app npm test
   only:
     - main
 
+# Deploy Stage
 deploy:
   stage: deploy
   script:
-    - echo "Deploying application"
+    - echo "Deploying Docker container"
     - docker-compose -f docker-compose.yml up -d
   only:
     - main
