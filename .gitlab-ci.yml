@@ -4,5 +4,5 @@ deploy:
     - docker-compose down
     - docker-compose up -d
   tags:
-    - docker
+    - node-project
 
