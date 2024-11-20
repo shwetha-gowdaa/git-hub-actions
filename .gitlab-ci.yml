@@ -1,41 +1,7 @@
-stages:
-  - build
-  - test
-  - deploy
-
-# Define environment variables
-variables:
-  DOCKER_IMAGE: node:16
-
-# Build the application
-build:
-  stage: build
-  script:
-    - docker build -t my-node-app .
-  tags:
-    - docker
-
-# Test the application
-test:
-  stage: test
-  script:
-    - npm install
-    - npm test
-  tags:
-    - docker
-
-# Deploy the application to EC2
 deploy:
   stage: deploy
   script:
-    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/gitlab-ci-key
-    - chmod 600 ~/.ssh/gitlab-ci-key
-    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/gitlab-ci-key ubuntu@3.109.1.243 '
-        cd /home/ubuntu/your-repository &&
-        git pull origin main &&
-        docker-compose down &&
-        docker-compose up -d'
-  only:
-    - main
-  tags:
-    - docker
+    - cd /home/ubuntu/node-app
+    - git pull origin main
+    - docker-compose down
+    - docker-compose up -d
