@@ -1,8 +1,6 @@
 deploy:
   stage: deploy
   script:
-    - cd /home/ubuntu/node-app
-    - git pull origin main
     - docker-compose down
     - docker-compose up -d
   tags:
