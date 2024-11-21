@@ -8,4 +8,4 @@ deploy:
     - docker-compose up --build -d
 
   tags:
-    - node-project
+    - shwetha
