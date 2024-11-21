@@ -8,6 +8,6 @@ deploy:
     - docker-compose up --build -d
 
   tags:
-    - shwetha
+    - sammy
 
 
