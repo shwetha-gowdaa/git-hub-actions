@@ -1,10 +1,10 @@
 deploy:
   stage: deploy
   script:
-    # Stop and remove any existing containers
+    
     - docker-compose down
 
-    # Build and start the containers in detached mode
+    
     - docker-compose up --build -d
 
   tags:
