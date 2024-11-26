@@ -5,7 +5,6 @@ pipeline {
         APP_PORT = '3000'
         DOCKER_IMAGE_NAME = 'nodejs-app'
         REPO_URL = 'https://github.com/shwetha-gowdaa/git-hub-actions.git'
-        APP_PATH = '/home/ubuntu/node-app'
     }
 
     stages {
@@ -15,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Install Docker') {
+        stage('Setup Docker') {
             steps {
                 sh '''
                 echo "Checking Docker installation..."
@@ -25,16 +24,15 @@ pipeline {
                   sudo apt install -y docker.io
                   sudo systemctl start docker
                   sudo systemctl enable docker
-                  sudo usermod -aG docker jenkins
-                  sudo usermod -aG docker ubuntu
-                  echo "Docker installed successfully."
                 else
                   echo "Docker is already installed."
                 fi
 
-                echo "Ensuring correct permissions for Docker socket..."
+                echo "Ensuring correct permissions for Docker..."
+                sudo usermod -aG docker $(whoami) || true
+                sudo usermod -aG docker jenkins || true
                 sudo chown root:docker /var/run/docker.sock
-                sudo chmod 660 /var/run/docker.sock
+                sudo chmod 666 /var/run/docker.sock
                 '''
             }
         }
@@ -43,11 +41,6 @@ pipeline {
             steps {
                 sh '''
                 echo "Building Docker image..."
-                # Ensure Buildx is installed
-                if ! docker buildx version &> /dev/null; then
-                  echo "Installing Buildx..."
-                  docker buildx install || true
-                fi
                 docker build -t $DOCKER_IMAGE_NAME .
                 '''
             }
