@@ -18,18 +18,23 @@ pipeline {
         stage('Install Docker') {
             steps {
                 sh '''
-                # Check if Docker is installed
+                echo "Checking Docker installation..."
                 if ! command -v docker &> /dev/null; then
                   echo "Installing Docker..."
                   sudo apt update
                   sudo apt install -y docker.io
                   sudo systemctl start docker
                   sudo systemctl enable docker
-                  sudo usermod -aG docker ubuntu || true
-                  sudo usermod -aG docker jenkins || true
+                  sudo usermod -aG docker jenkins
+                  sudo usermod -aG docker ubuntu
+                  echo "Docker installed successfully."
                 else
-                  echo "Docker already installed."
+                  echo "Docker is already installed."
                 fi
+
+                echo "Ensuring correct permissions for Docker socket..."
+                sudo chown root:docker /var/run/docker.sock
+                sudo chmod 660 /var/run/docker.sock
                 '''
             }
         }
@@ -38,6 +43,11 @@ pipeline {
             steps {
                 sh '''
                 echo "Building Docker image..."
+                # Ensure Buildx is installed
+                if ! docker buildx version &> /dev/null; then
+                  echo "Installing Buildx..."
+                  docker buildx install || true
+                fi
                 docker build -t $DOCKER_IMAGE_NAME .
                 '''
             }
@@ -46,7 +56,7 @@ pipeline {
         stage('Run Application') {
             steps {
                 sh '''
-                echo "Stopping existing container..."
+                echo "Stopping existing container if running..."
                 docker stop $DOCKER_IMAGE_NAME || true
                 docker rm $DOCKER_IMAGE_NAME || true
 
@@ -60,6 +70,12 @@ pipeline {
     post {
         always {
             echo "Pipeline execution completed."
+        }
+        failure {
+            echo "Pipeline failed. Check the logs for details."
+        }
+        success {
+            echo "Pipeline executed successfully!"
         }
     }
 }
