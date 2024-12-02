@@ -6,7 +6,6 @@ pipeline {
         DOCKER_IMAGE_NAME = 'nodejs-app'
         REPO_URL = 'https://github.com/shwetha-gowdaa/git-hub-actions.git'
         SWARM_STACK_NAME = 'myapp'  // Docker Swarm Stack name
-        DOCKER_HUB_REPO = 'shwethagowda16'  // Replace with your Docker Hub username
     }
 
     stages {
@@ -64,36 +63,7 @@ pipeline {
             steps {
                 echo "Building Docker image..."
                 sh '''
-                docker build -t $DOCKER_IMAGE_NAME .  // Build the image
-                '''
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                echo "Logging in to Docker Hub..."
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                    }
-                }
-            }
-        }
-
-        stage('Tag Docker Image for Docker Hub') {
-            steps {
-                echo "Tagging Docker image for Docker Hub..."
-                sh '''
-                docker tag $DOCKER_IMAGE_NAME $DOCKER_HUB_REPO/$DOCKER_IMAGE_NAME:latest
-                '''
-            }
-        }
-
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                echo "Pushing Docker image to Docker Hub..."
-                sh '''
-                docker push $DOCKER_HUB_REPO/$DOCKER_IMAGE_NAME:latest
+                docker build -t $DOCKER_IMAGE_NAME .  # Ensure '.' is provided for context
                 '''
             }
         }
