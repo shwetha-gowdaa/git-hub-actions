@@ -5,6 +5,7 @@ pipeline {
         APP_PORT = '3000'
         DOCKER_IMAGE_NAME = 'nodejs-app'
         REPO_URL = 'https://github.com/shwetha-gowdaa/git-hub-actions.git'
+        SWARM_STACK_NAME = 'myapp'  // Docker Swarm Stack name
     }
 
     stages {
@@ -67,17 +68,22 @@ pipeline {
             }
         }
 
-        stage('Stop Old Container and Run New Application') {
+        stage('Deploy to Docker Swarm') {
             steps {
-                echo "Stopping and removing old containers..."
-                sh '''
-                docker stop $DOCKER_IMAGE_NAME || true
-                docker rm $DOCKER_IMAGE_NAME || true
-                '''
-                echo "Running new container..."
-                sh '''
-                docker run -d --name $DOCKER_IMAGE_NAME -p $APP_PORT:$APP_PORT $DOCKER_IMAGE_NAME
-                '''
+                echo "Deploying to Docker Swarm..."
+                script {
+                    // Create Docker Swarm service if not already running
+                    sh '''
+                    docker stack deploy -c docker-compose.yml $SWARM_STACK_NAME
+                    '''
+                }
+            }
+        }
+
+        stage('Check Service Status') {
+            steps {
+                echo "Checking Docker Swarm service status..."
+                sh 'docker service ls'
             }
         }
     }
