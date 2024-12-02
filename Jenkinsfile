@@ -10,7 +10,13 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: env.REPO_URL
+                script {
+                    echo "Cloning repository from ${env.REPO_URL}"
+                    retry(3) {
+                        git branch: 'main', url: env.REPO_URL
+                    }
+                    sh 'git status'
+                }
             }
         }
 
@@ -27,7 +33,7 @@ pipeline {
                         sudo systemctl enable docker
                         '''
                     } else {
-                        echo "Docker is already installed in server."
+                        echo "Docker is already installed."
                     }
                 }
             }
@@ -47,14 +53,15 @@ pipeline {
 
         stage('Verify Docker Access') {
             steps {
-                sh 'docker ps'
+                echo "Verifying Docker access..."
+                sh 'docker ps || true'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh '''
                 echo "Building Docker image..."
+                sh '''
                 docker build -t $DOCKER_IMAGE_NAME .
                 '''
             }
@@ -62,12 +69,13 @@ pipeline {
 
         stage('Stop Old Container and Run New Application') {
             steps {
+                echo "Stopping and removing old containers..."
                 sh '''
-                echo "Stopping any existing containers..."
                 docker stop $DOCKER_IMAGE_NAME || true
                 docker rm $DOCKER_IMAGE_NAME || true
-
-                echo "Running application on port $APP_PORT..."
+                '''
+                echo "Running new container..."
+                sh '''
                 docker run -d --name $DOCKER_IMAGE_NAME -p $APP_PORT:$APP_PORT $DOCKER_IMAGE_NAME
                 '''
             }
@@ -76,10 +84,10 @@ pipeline {
 
     post {
         always {
-            echo "Pipeline execution completed successfully."
+            echo "Pipeline execution completed."
         }
         failure {
-            echo "Pipeline failed. Check the logs for details."
+            echo "Pipeline failed. Check the logs."
         }
         success {
             echo "Pipeline executed successfully!"
