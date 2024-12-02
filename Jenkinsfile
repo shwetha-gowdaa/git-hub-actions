@@ -27,7 +27,7 @@ pipeline {
                         sudo systemctl enable docker
                         '''
                     } else {
-                        echo "Docker is already installed."
+                        echo "Docker is already installed in server."
                     }
                 }
             }
