@@ -40,8 +40,14 @@ pipeline {
                 sudo usermod -aG docker $(whoami) || true
                 sudo usermod -aG docker jenkins || true
                 sudo chown root:docker /var/run/docker.sock
-                sudo chmod 666 /var/run/docker.sock
+                sudo chmod 660 /var/run/docker.sock
                 '''
+            }
+        }
+
+        stage('Verify Docker Access') {
+            steps {
+                sh 'docker ps'
             }
         }
 
