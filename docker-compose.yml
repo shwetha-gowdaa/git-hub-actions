@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   nodejs-app:
+    image: nodejs-app
     build: .
     ports:
       - "3000:3000"
@@ -9,3 +10,12 @@ services:
       - .:/usr/src/app
     environment:
       - NODE_ENV=development
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 500M
+      placement:
+        constraints:
+          - node.role == worker
