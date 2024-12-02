@@ -21,10 +21,10 @@ pipeline {
                     if (!dockerInstalled) {
                         echo "Docker is not installed. Installing Docker..."
                         sh '''
-                        sudo apt update
-                        sudo apt install -y docker.io
-                        sudo systemctl start docker
-                        sudo systemctl enable docker
+                        apt update
+                        apt install -y docker.io
+                        systemctl start docker
+                        systemctl enable docker
                         '''
                     } else {
                         echo "Docker is already installed."
@@ -37,10 +37,10 @@ pipeline {
             steps {
                 echo "Ensuring Docker permissions for Jenkins user..."
                 sh '''
-                sudo usermod -aG docker $(whoami) || true
-                sudo usermod -aG docker jenkins || true
-                sudo chown root:docker /var/run/docker.sock
-                sudo chmod 666 /var/run/docker.sock
+                usermod -aG docker $(whoami) || true
+                usermod -aG docker jenkins || true
+                chown root:docker /var/run/docker.sock
+                chmod 666 /var/run/docker.sock
                 '''
             }
         }
