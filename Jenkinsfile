@@ -72,7 +72,7 @@ pipeline {
             steps {
                 echo "Deploying to Docker Swarm..."
                 script {
-                    // Create Docker Swarm service if not already running
+                    // Deploy to Swarm, using the built image
                     sh '''
                     docker stack deploy -c docker-compose.yml $SWARM_STACK_NAME
                     '''
@@ -84,6 +84,7 @@ pipeline {
             steps {
                 echo "Checking Docker Swarm service status..."
                 sh 'docker service ls'
+                sh 'docker stack ps $SWARM_STACK_NAME' // More detailed status check
             }
         }
     }
