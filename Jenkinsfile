@@ -70,7 +70,7 @@ pipeline {
 
     post {
         always {
-            echo "Pipeline execution completed."
+            echo "Pipeline execution completed successfully."
         }
         failure {
             echo "Pipeline failed. Check the logs for details."
