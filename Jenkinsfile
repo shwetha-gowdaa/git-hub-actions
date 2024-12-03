@@ -6,6 +6,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'nodejs-app'
         REPO_URL = 'https://github.com/shwetha-gowdaa/git-hub-actions.git'
         SWARM_STACK_NAME = 'myapp-docker-swarm'  // Docker Swarm Stack name
+        DOCKER_REGISTRY = 'shwethagowda16/node-sample-app'  // Docker Hub registry with your username and repo name
     }
 
     stages {
@@ -83,8 +84,8 @@ pipeline {
             steps {
                 echo "Pushing Docker image to Docker Hub..."
                 sh '''
-                docker tag $DOCKER_IMAGE_NAME $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
-                docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
+                docker tag $DOCKER_IMAGE_NAME $DOCKER_REGISTRY:latest
+                docker push $DOCKER_REGISTRY:latest
                 '''
             }
         }
@@ -93,7 +94,6 @@ pipeline {
             steps {
                 echo "Deploying to Docker Swarm..."
                 script {
-                    // Deploy to Swarm using the built image from Docker Hub
                     sh '''
                     docker stack deploy -c docker-compose.yml $SWARM_STACK_NAME
                     '''
