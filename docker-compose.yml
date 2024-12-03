@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   nodejs-app:
-    image: nodejs-app
-    build: .
+    image: shwethagowda16/node-sample-app:latest  # Use the image pushed to Docker Hub
     ports:
       - "3000:3000"
     environment:
