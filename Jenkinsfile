@@ -5,7 +5,8 @@ pipeline {
         APP_PORT = '3000'
         DOCKER_IMAGE_NAME = 'nodejs-app'
         REPO_URL = 'https://github.com/shwetha-gowdaa/git-hub-actions.git'
-        SWARM_STACK_NAME = 'myapp'  // Docker Swarm Stack name
+        SWARM_STACK_NAME = 'myapp-docker-swarm'  // Docker Swarm Stack name
+        DOCKER_REGISTRY = 'node-sample-app'  // Docker Hub registry
     }
 
     stages {
@@ -68,11 +69,32 @@ pipeline {
             }
         }
 
+        stage('Login to Docker Hub') {
+            steps {
+                echo "Logging into Docker Hub..."
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh '''
+                    docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                echo "Pushing Docker image to Docker Hub..."
+                sh '''
+                docker tag $DOCKER_IMAGE_NAME $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
+                docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
+                '''
+            }
+        }
+
         stage('Deploy to Docker Swarm') {
             steps {
                 echo "Deploying to Docker Swarm..."
                 script {
-                    // Deploy to Swarm, using the built image
+                    // Deploy to Swarm using the built image from Docker Hub
                     sh '''
                     docker stack deploy -c docker-compose.yml $SWARM_STACK_NAME
                     '''
