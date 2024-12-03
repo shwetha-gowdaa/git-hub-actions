@@ -16,10 +16,9 @@ services:
           memory: 500M
       placement:
         constraints:
-          - node.role == worker
+          - node.role == worker  # Ensure replicas are deployed on worker nodes
     volumes:
       - nodejs-app-data:/usr/src/app
 
 volumes:
   nodejs-app-data:
-    driver: local
