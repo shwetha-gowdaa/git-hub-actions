@@ -6,7 +6,6 @@ pipeline {
         DOCKER_IMAGE_NAME = 'nodejs-app'
         REPO_URL = 'https://github.com/shwetha-gowdaa/git-hub-actions.git'
         SWARM_STACK_NAME = 'myapp-docker-swarm'  // Docker Swarm Stack name
-        DOCKER_REGISTRY = 'node-sample-app'  // Docker Hub registry
     }
 
     stages {
