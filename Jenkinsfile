@@ -63,7 +63,7 @@ pipeline {
             steps {
                 echo "Building Docker image..."
                 sh '''
-                docker build -t $DOCKER_IMAGE_NAME .  # Ensure '.' is provided for context
+                docker build -t $DOCKER_IMAGE_NAME .
                 '''
             }
         }
