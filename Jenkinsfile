@@ -64,7 +64,7 @@ pipeline {
             steps {
                 echo "Building Docker image..."
                 sh '''
-                docker build -t $DOCKER_IMAGE_NAME .
+                docker build -t $DOCKER_IMAGE_NAME . 
                 '''
             }
         }
@@ -94,6 +94,7 @@ pipeline {
             steps {
                 echo "Deploying to Docker Swarm..."
                 script {
+                    // Ensure the service is deployed with replicas on worker nodes
                     sh '''
                     docker stack deploy -c docker-compose.yml $SWARM_STACK_NAME
                     '''
