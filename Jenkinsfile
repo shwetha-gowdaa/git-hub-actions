@@ -5,8 +5,8 @@ pipeline {
         APP_PORT = '3000'
         DOCKER_IMAGE_NAME = 'nodejs-app'
         REPO_URL = 'https://github.com/shwetha-gowdaa/git-hub-actions.git'
-        SWARM_STACK_NAME = 'myapp-docker-swarm'  // Docker Swarm Stack name
-        DOCKER_REGISTRY = 'shwethagowda16/node-sample-app'  // Docker Hub registry with your username and repo name
+        SWARM_STACK_NAME = 'myapp-docker-swarm'  
+        DOCKER_REGISTRY = 'shwethagowda16/node-sample-app'  
     }
 
     stages {
@@ -94,7 +94,7 @@ pipeline {
             steps {
                 echo "Deploying to Docker Swarm..."
                 script {
-                    // Ensure the service is deployed with replicas on worker nodes
+                    
                     sh '''
                     docker stack deploy -c docker-compose.yml $SWARM_STACK_NAME
                     '''
@@ -106,8 +106,7 @@ pipeline {
             steps {
                 echo "Checking Docker Swarm service status..."
                 sh 'docker service ls'
-                sh 'docker stack ps $SWARM_STACK_NAME' // More detailed status check
-            }
+                sh 'docker stack ps $SWARM_STACK_NAME'             }
         }
     }
 
