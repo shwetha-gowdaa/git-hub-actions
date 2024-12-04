@@ -106,7 +106,8 @@ pipeline {
             steps {
                 echo "Checking Docker Swarm service status..."
                 sh 'docker service ls'
-                sh 'docker stack ps $SWARM_STACK_NAME'             }
+                sh 'docker stack ps $SWARM_STACK_NAME'             
+            }
         }
     }
 
